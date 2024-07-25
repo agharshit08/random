@@ -1,0 +1,147 @@
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "terms": {
+            "state": ["NEW", "ASSIGNED", "COMPLETED"]
+          }
+        },
+        {
+          "term": {
+            "tenantId": "tenant123"
+          }
+        },
+        {
+          "range": {
+            "createdTime": {
+              "gte": 1714027380000,
+              "lte": 1721889780000
+            }
+          }
+        },
+        {
+          "bool": {
+            "should": [
+              {
+                "term": {
+                  "state": "NEW"
+                }
+              },
+              {
+                "bool": {
+                  "must": [
+                    {
+                      "term": {
+                        "state": "NEW"
+                      }
+                    },
+                    {
+                      "term": {
+                        "assignee": "userId123"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "bool": {
+                  "must": [
+                    {
+                      "term": {
+                        "state": "NEW"
+                      }
+                    },
+                    {
+                      "term": {
+                        "assigneeEmployeeNumber": "emp123"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "filter": [
+        {
+          "bool": {
+            "should": [
+              {
+                "bool": {
+                  "must": [
+                    {
+                      "term": {
+                        "assignmentType": "SELF"
+                      }
+                    },
+                    {
+                      "bool": {
+                        "should": [
+                          {
+                            "nested": {
+                              "path": "allowedExecutors",
+                              "query": {
+                                "bool": {
+                                  "must": [
+                                    { "term": { "allowedExecutors.type": "USER" } },
+                                    { "term": { "allowedExecutors.id": "userId123" } }
+                                  ]
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "nested": {
+                              "path": "allowedExecutors",
+                              "query": {
+                                "bool": {
+                                  "must": [
+                                    { "term": { "allowedExecutors.type": "EMPLOYEE_NUMBER" } },
+                                    { "term": { "allowedExecutors.id": "emp123" } }
+                                  ]
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "nested": {
+                  "path": "allowedReassigners",
+                  "query": {
+                    "bool": {
+                      "should": [
+                        {
+                          "bool": {
+                            "must": [
+                              { "term": { "allowedReassigners.type": "USER" } },
+                              { "term": { "allowedReassigners.id": "userId123" } }
+                            ]
+                          }
+                        },
+                        {
+                          "bool": {
+                            "must": [
+                              { "term": { "allowedReassigners.type": "EMPLOYEE_NUMBER" } },
+                              { "term": { "allowedReassigners.id": "emp123" } }
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
