@@ -4,17 +4,17 @@
       "must": [
         {
           "terms": {
-            "state": ["NEW", "ASSIGNED", "COMPLETED"]
+            "orderState": ["CREATED", "COMPLETED"]
           }
         },
         {
           "term": {
-            "tenantId": "tenant123"
+            "platformId": "platform123"
           }
         },
         {
           "range": {
-            "createdTime": {
+            "createdAt": {
               "gte": 1714027380000,
               "lte": 1721889780000
             }
@@ -25,7 +25,7 @@
             "should": [
               {
                 "term": {
-                  "state": "NEW"
+                  "orderState": "CREATED"
                 }
               },
               {
@@ -33,12 +33,12 @@
                   "must": [
                     {
                       "term": {
-                        "state": "NEW"
+                        "orderState": "CREATED"
                       }
                     },
                     {
                       "term": {
-                        "assignee": "userId123"
+                        "userId": "userId123"
                       }
                     }
                   ]
@@ -54,7 +54,7 @@
                     },
                     {
                       "term": {
-                        "assigneeEmployeeNumber": "emp123"
+                        "orderNumber": "orderNumber123"
                       }
                     }
                   ]
@@ -73,7 +73,7 @@
                   "must": [
                     {
                       "term": {
-                        "assignmentType": "SELF"
+                        "orderType": "COD"
                       }
                     },
                     {
@@ -81,12 +81,12 @@
                         "should": [
                           {
                             "nested": {
-                              "path": "allowedExecutors",
+                              "path": "delivery",
                               "query": {
                                 "bool": {
                                   "must": [
-                                    { "term": { "allowedExecutors.type": "USER" } },
-                                    { "term": { "allowedExecutors.id": "userId123" } }
+                                    { "term": { "delivery.type": "FAST" } },
+                                    { "term": { "delivery.id": "deliver123" } }
                                   ]
                                 }
                               }
@@ -94,12 +94,12 @@
                           },
                           {
                             "nested": {
-                              "path": "allowedExecutors",
+                              "path": "delivery",
                               "query": {
                                 "bool": {
                                   "must": [
-                                    { "term": { "allowedExecutors.type": "EMPLOYEE_NUMBER" } },
-                                    { "term": { "allowedExecutors.id": "emp123" } }
+                                    { "term": { "delivery.type": "FAST" } },
+                                    { "term": { "delivery.id": "deliver123" } }
                                   ]
                                 }
                               }
@@ -113,23 +113,23 @@
               },
               {
                 "nested": {
-                  "path": "allowedReassigners",
+                  "path": "raters",
                   "query": {
                     "bool": {
                       "should": [
                         {
                           "bool": {
                             "must": [
-                              { "term": { "allowedReassigners.type": "USER" } },
-                              { "term": { "allowedReassigners.id": "userId123" } }
+                              { "term": { "delivery.type": "FAST" } },
+                                    { "term": { "delivery.id": "deliver123" } }
                             ]
                           }
                         },
                         {
                           "bool": {
                             "must": [
-                              { "term": { "allowedReassigners.type": "EMPLOYEE_NUMBER" } },
-                              { "term": { "allowedReassigners.id": "emp123" } }
+                              { "term": { "delivery.type": "FAST" } },
+                                    { "term": { "delivery.id": "deliver123" } }
                             ]
                           }
                         }
