@@ -1,38 +1,47 @@
 version: '3'
 services:
-  download-service:
-    image: download-service
-    build:
-      context: ./download-service
-    ports:
-      - "8081:8080"
-    networks:
-      - app-network
+  localstack:
+    image: localstack/localstack
+    container_name: localstack
     environment:
-      - SPRING_PROFILES_ACTIVE=prod
+      - SERVICES=s3
+      - DEBUG=1
+      - DATA_DIR=/tmp/localstack/data
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      - SKIP_SSL_CERT_DOWNLOAD=1  # Avoid SSL issues with Localstack
+    ports:
+      - "4566:4566"  # Localstack main service port
+    volumes:
+      - "./localstack:/tmp/localstack"  # For persisting data (optional)
+    networks:
+      - plutus-network
 
-  upload-service:
-    image: upload-service
-    build:
-      context: ./upload-service
+  plutus:
+    image: plutus:latest  # Your built Docker image of the service
+    container_name: plutus
     ports:
-      - "8082:8080"
+      - "8080:8080"  # Exposing your service on port 8080
     networks:
-      - app-network
+      - plutus-network
+    depends_on:
+      - localstack  # Ensure Localstack starts before the service
     environment:
-      - SPRING_PROFILES_ACTIVE=prod
-
-  metadata-service:
-    image: metadata-service
-    build:
-      context: ./metadata-service
-    ports:
-      - "8083:8080"
-    networks:
-      - app-network
-    environment:
-      - SPRING_PROFILES_ACTIVE=prod
+      - AWS_ACCESS_KEY_ID=test  # Environment variables for AWS credentials
+      - AWS_SECRET_ACCESS_KEY=test
+      - AWS_REGION=ap-south-1  # Region to match Localstack configuration
 
 networks:
-  app-network:
+  plutus-network:
     driver: bridge
+
+
+Upvote
+4
+
+Downvote
+
+3
+comments
+
+
