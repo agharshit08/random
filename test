@@ -36,3 +36,26 @@ ij_java_align_multiline_chained_methods = true
 
 # Wrapping settings for chained method calls and lambda expressions
 ij_java_method_call_chain_wrap = true
+
+
+public class StringHelper {
+    public static String extractParameter(String input) {
+        // Regular expression to match {{param}}
+        String regex = "\\{\\{(.*?)\\}\\}";
+        java.util.regex.Pattern pattern = java.util.regex.Pattern.compile(regex);
+        java.util.regex.Matcher matcher = pattern.matcher(input);
+
+        // Check if the pattern matches
+        if (matcher.find()) {
+            return matcher.group(1); // Return the captured group (the parameter)
+        } else {
+            return null; // Return null if no match is found
+        }
+    }
+
+    public static void main(String[] args) {
+        String input = "{{param}}";
+        String extractedParam = extractParameter(input);
+        System.out.println(extractedParam); // Output: param
+    }
+}
