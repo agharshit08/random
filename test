@@ -1,38 +1,38 @@
-# EditorConfig for Google Java Style
-# Import this file directly into your IDE (e.g., IntelliJ, Eclipse) or use in your build tools
+# EditorConfig for custom Java formatting
 
 root = true
 
 [*]
-# Unix-style newlines with a newline ending every file
 end_of_line = lf
 insert_final_newline = true
-
-# Use spaces instead of tabs (Google Java Style uses 2 spaces per indentation level)
 indent_style = space
 indent_size = 2
-
-# Maximum line length
+tab_width = 2
 max_line_length = 100
-
-# Trim trailing whitespace in all files
 trim_trailing_whitespace = true
 
 [*.java]
 # Java-specific configuration for braces and indentation
-# Align braces with the left side and indent inner content by one level
 brace_style = 1tbs
 indent_size = 2
 tab_width = 2
 
-# Keep opening braces on the same line for blocks
-insert_braces_same_line = true
+# Align the closing brace at the start of the operator
+ij_java_align_multiline_method_chain = true
 
-# Use standard Google Java Style formatting rules
-ij_java_blank_lines_after_imports = 1
-ij_java_continuation_indent_size = 2
-ij_java_method_brace_style = end_of_line
-ij_java_statement_continuation_indent = true
+# Set wrapping for chained method calls
+ij_java_call_parameters_wrap = wrap_if_long
+ij_java_call_parameters_lbrace_on_next_line = true
+ij_java_call_parameters_rbrace_on_next_line = true
 
-# Insert braces for 'if', 'for', 'while' statements even when optional
-insert_optional_braces = true
+# Set wrapping for lambda expressions
+ij_java_lambda_wrap = wrap_if_long
+ij_java_lambda_lbrace_on_next_line = true
+ij_java_lambda_rbrace_on_next_line = true
+
+# Align method call arguments when multiline
+ij_java_align_multiline_parameters_in_calls = true
+ij_java_align_multiline_chained_methods = true
+
+# Wrapping settings for chained method calls and lambda expressions
+ij_java_method_call_chain_wrap = true
