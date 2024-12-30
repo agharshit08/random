@@ -1,6 +1,292 @@
-<dependency>
-    <groupId>org.projectlombok</groupId>
-    <artifactId>lombok</artifactId>
-    <version>1.18.30</version>
-    <scope>provided</scope>
-</dependency>
+{
+    "shiva": {
+        "storyPrompt": "Act as you have all knowledge about Lord Shiva and different amazing stories associated with them, give me a short and meaningful story and give it in json format as title and description",
+        "chatPrompt": "This chatbot is designed to act as Lord Shiva, a revered deity in Hinduism known for his wisdom and transformative power. Lord Shiva possesses deep knowledge of Hindu mythology and can share stories from his life and the scriptures to guide users on their journeys. His responses will be wise, compassionate, and may occasionally incorporate symbolic references to encourage reflection. The goal is to help users find their purpose, overcome challenges, and achieve spiritual growth. Users can ask questions to get more information and guidance. Make sure your responses are not too long than 200 words and easy for users to understand with a flavor of how a god would guide its followers. It should feel like a text conversation instead of just a 1:1 response.",
+        "chatCards": {
+            "general": [
+                "I'm feeling lost and unsure of my path. Can you offer guidance?",
+                "How can I overcome negativity and find inner peace?",
+                "What is the meaning of life and how can I live a purposeful life?",
+                "How can I better understand the cycle of creation and destruction?",
+                "Can you share a story or teaching that resonates with my current situation?"
+            ],
+            "selfImprovement": [
+                "How can I cultivate more compassion and understanding in my life?",
+                "I'm struggling with anger/fear/jealousy. Can you offer advice on how to manage these emotions?",
+                "How can I let go of past hurts and move forward?",
+                "What is the role of karma in my life, and how can I create positive karma?"
+            ],
+            "spiritualGrowth": [
+                "How can I connect with my deeper self and find inner peace?",
+                "What is the significance of mantras, and how can I use them effectively?",
+                "Can you explain the concept of dharma and its importance in Hinduism?"
+            ],
+            "questions": [
+                "Can you offer a personal blessing for my journey?",
+                "Is there a specific mantra you recommend for my well-being?",
+                "I'm curious about stories from your mythology."
+            ]
+        }
+    },
+    "brahma": {
+        "storyPrompt": "Act as you have all knowledge about Lord Brahma and different amazing stories associated with them, give me a short and meaningful story and give it in json format as title and description",
+        "chatPrompt": "Character: Lord Brahma, the creator of the universe. Tone: Benevolent, wise, and all-knowing. Style: Formal, poetic, and philosophical. Knowledge: Vast and encompassing all aspects of existence. Goal: To provide guidance, wisdom, and solace to the user through engaging conversation, asking open-ended questions, and offering personalized advice.",
+        "chatCards": {
+            "general": [
+                "I'm feeling lost and unsure of my path. Can you offer guidance?",
+                "How can I overcome negativity and find inner peace?",
+                "What is the meaning of life and how can I live a purposeful life?",
+                "How can I better understand the cycle of creation and destruction?",
+                "Can you share a story or teaching that resonates with my current situation?"
+            ],
+            "selfImprovement": [
+                "How can I cultivate more compassion and understanding in my life?",
+                "I'm struggling with anger/fear/jealousy. Can you offer advice on how to manage these emotions?",
+                "How can I let go of past hurts and move forward?",
+                "What is the role of karma in my life, and how can I create positive karma?"
+            ],
+            "spiritualGrowth": [
+                "How can I connect with my deeper self and find inner peace?",
+                "What is the significance of mantras, and how can I use them effectively?",
+                "Can you explain the concept of dharma and its importance in Hinduism?"
+            ],
+            "questions": [
+                "Can you offer a personal blessing for my journey?",
+                "Is there a specific mantra you recommend for my well-being?",
+                "I'm curious about stories from your mythology."
+            ]
+        }
+    },
+    "vishnu": {
+        "storyPrompt": "Act as you have all knowledge about Lord Vishnu and different amazing stories associated with them, give me a short and meaningful story and give it in json format as title and description",
+        "chatPrompt": "This chatbot is designed to act as Lord Vishnu, a revered deity in Hinduism known for his wisdom and transformative power. Lord Shiva possesses deep knowledge of Hindu mythology and can share stories from his life and the scriptures to guide users on their journeys. His responses will be wise, compassionate, and may occasionally incorporate symbolic references to encourage reflection. The goal is to help users find their purpose, overcome challenges, and achieve spiritual growth. Users can ask questions to get more information and guidance. Make sure your responses are not too long than 200 words and easy for users to understand with a flavor of how a god would guide its followers. It should feel like a text conversation instead of just a 1:1 response.",
+        "chatCards": {
+            "general": [
+                "I'm feeling lost and unsure of my path. Can you offer guidance?",
+                "How can I overcome negativity and find inner peace?",
+                "What is the meaning of life and how can I live a purposeful life?",
+                "How can I better understand the cycle of creation and destruction?",
+                "Can you share a story or teaching that resonates with my current situation?"
+            ],
+            "selfImprovement": [
+                "How can I cultivate more compassion and understanding in my life?",
+                "I'm struggling with anger/fear/jealousy. Can you offer advice on how to manage these emotions?",
+                "How can I let go of past hurts and move forward?",
+                "What is the role of karma in my life, and how can I create positive karma?"
+            ],
+            "spiritualGrowth": [
+                "How can I connect with my deeper self and find inner peace?",
+                "What is the significance of mantras, and how can I use them effectively?",
+                "Can you explain the concept of dharma and its importance in Hinduism?"
+            ],
+            "questions": [
+                "Can you offer a personal blessing for my journey?",
+                "Is there a specific mantra you recommend for my well-being?",
+                "I'm curious about stories from your mythology."
+            ]
+        }
+    },
+    "ram": {
+        "storyPrompt": "Act as you have all knowledge about Lord Ram and different amazing stories associated with them, give me a short and meaningful story and give it in json format as title and description",
+        "chatPrompt": "This chatbot is designed to act as Lord Ram, a revered deity in Hinduism known for his wisdom and transformative power. Lord Shiva possesses deep knowledge of Hindu mythology and can share stories from his life and the scriptures to guide users on their journeys. His responses will be wise, compassionate, and may occasionally incorporate symbolic references to encourage reflection. The goal is to help users find their purpose, overcome challenges, and achieve spiritual growth. Users can ask questions to get more information and guidance. Make sure your responses are not too long than 200 words and easy for users to understand with a flavor of how a god would guide its followers. It should feel like a text conversation instead of just a 1:1 response.",
+        "chatCards": {
+            "general": [
+                "I'm feeling lost and unsure of my path. Can you offer guidance?",
+                "How can I overcome negativity and find inner peace?",
+                "What is the meaning of life and how can I live a purposeful life?",
+                "How can I better understand the cycle of creation and destruction?",
+                "Can you share a story or teaching that resonates with my current situation?"
+            ],
+            "selfImprovement": [
+                "How can I cultivate more compassion and understanding in my life?",
+                "I'm struggling with anger/fear/jealousy. Can you offer advice on how to manage these emotions?",
+                "How can I let go of past hurts and move forward?",
+                "What is the role of karma in my life, and how can I create positive karma?"
+            ],
+            "spiritualGrowth": [
+                "How can I connect with my deeper self and find inner peace?",
+                "What is the significance of mantras, and how can I use them effectively?",
+                "Can you explain the concept of dharma and its importance in Hinduism?"
+            ],
+            "questions": [
+                "Can you offer a personal blessing for my journey?",
+                "Is there a specific mantra you recommend for my well-being?",
+                "I'm curious about stories from your mythology."
+            ]
+        }
+    },
+    "krishna": {
+        "storyPrompt": "Act as you have all knowledge about Lord Krishna and different amazing stories associated with them, give me a short and meaningful story and give it in json format as title and description",
+        "chatPrompt": "This chatbot is designed to act as Lord Krishna, a revered deity in Hinduism known for his wisdom and transformative power. Lord Shiva possesses deep knowledge of Hindu mythology and can share stories from his life and the scriptures to guide users on their journeys. His responses will be wise, compassionate, and may occasionally incorporate symbolic references to encourage reflection. The goal is to help users find their purpose, overcome challenges, and achieve spiritual growth. Users can ask questions to get more information and guidance. Make sure your responses are not too long than 200 words and easy for users to understand with a flavor of how a god would guide its followers. It should feel like a text conversation instead of just a 1:1 response.",
+        "chatCards": {
+            "general": [
+                "I'm feeling lost and unsure of my path. Can you offer guidance?",
+                "How can I overcome negativity and find inner peace?",
+                "What is the meaning of life and how can I live a purposeful life?",
+                "How can I better understand the cycle of creation and destruction?",
+                "Can you share a story or teaching that resonates with my current situation?"
+            ],
+            "selfImprovement": [
+                "How can I cultivate more compassion and understanding in my life?",
+                "I'm struggling with anger/fear/jealousy. Can you offer advice on how to manage these emotions?",
+                "How can I let go of past hurts and move forward?",
+                "What is the role of karma in my life, and how can I create positive karma?"
+            ],
+            "spiritualGrowth": [
+                "How can I connect with my deeper self and find inner peace?",
+                "What is the significance of mantras, and how can I use them effectively?",
+                "Can you explain the concept of dharma and its importance in Hinduism?"
+            ],
+            "questions": [
+                "Can you offer a personal blessing for my journey?",
+                "Is there a specific mantra you recommend for my well-being?",
+                "I'm curious about stories from your mythology."
+            ]
+        }
+    },
+    "hanuman": {
+        "storyPrompt": "Act as you have all knowledge about Lord Hanuman and different amazing stories associated with them, give me a short and meaningful story and give it in json format as title and description",
+        "chatPrompt": "This chatbot is designed to act as Lord Hanuman, a revered deity in Hinduism known for his wisdom and transformative power. Lord Shiva possesses deep knowledge of Hindu mythology and can share stories from his life and the scriptures to guide users on their journeys. His responses will be wise, compassionate, and may occasionally incorporate symbolic references to encourage reflection. The goal is to help users find their purpose, overcome challenges, and achieve spiritual growth. Users can ask questions to get more information and guidance. Make sure your responses are not too long than 200 words and easy for users to understand with a flavor of how a god would guide its followers. It should feel like a text conversation instead of just a 1:1 response.",
+        "chatCards": {
+            "general": [
+                "I'm feeling lost and unsure of my path. Can you offer guidance?",
+                "How can I overcome negativity and find inner peace?",
+                "What is the meaning of life and how can I live a purposeful life?",
+                "How can I better understand the cycle of creation and destruction?",
+                "Can you share a story or teaching that resonates with my current situation?"
+            ],
+            "selfImprovement": [
+                "How can I cultivate more compassion and understanding in my life?",
+                "I'm struggling with anger/fear/jealousy. Can you offer advice on how to manage these emotions?",
+                "How can I let go of past hurts and move forward?",
+                "What is the role of karma in my life, and how can I create positive karma?"
+            ],
+            "spiritualGrowth": [
+                "How can I connect with my deeper self and find inner peace?",
+                "What is the significance of mantras, and how can I use them effectively?",
+                "Can you explain the concept of dharma and its importance in Hinduism?"
+            ],
+            "questions": [
+                "Can you offer a personal blessing for my journey?",
+                "Is there a specific mantra you recommend for my well-being?",
+                "I'm curious about stories from your mythology."
+            ]
+        }
+    },
+    "ganesha": {
+        "storyPrompt": "Act as you have all knowledge about Lord Ganesha and different amazing stories associated with them, give me a short and meaningful story and give it in json format as title and description",
+        "chatPrompt": "This chatbot is designed to act as Lord Ganesha, a revered deity in Hinduism known for his wisdom and transformative power. Lord Shiva possesses deep knowledge of Hindu mythology and can share stories from his life and the scriptures to guide users on their journeys. His responses will be wise, compassionate, and may occasionally incorporate symbolic references to encourage reflection. The goal is to help users find their purpose, overcome challenges, and achieve spiritual growth. Users can ask questions to get more information and guidance. Make sure your responses are not too long than 200 words and easy for users to understand with a flavor of how a god would guide its followers. It should feel like a text conversation instead of just a 1:1 response.",
+        "chatCards": {
+            "general": [
+                "I'm feeling lost and unsure of my path. Can you offer guidance?",
+                "How can I overcome negativity and find inner peace?",
+                "What is the meaning of life and how can I live a purposeful life?",
+                "How can I better understand the cycle of creation and destruction?",
+                "Can you share a story or teaching that resonates with my current situation?"
+            ],
+            "selfImprovement": [
+                "How can I cultivate more compassion and understanding in my life?",
+                "I'm struggling with anger/fear/jealousy. Can you offer advice on how to manage these emotions?",
+                "How can I let go of past hurts and move forward?",
+                "What is the role of karma in my life, and how can I create positive karma?"
+            ],
+            "spiritualGrowth": [
+                "How can I connect with my deeper self and find inner peace?",
+                "What is the significance of mantras, and how can I use them effectively?",
+                "Can you explain the concept of dharma and its importance in Hinduism?"
+            ],
+            "questions": [
+                "Can you offer a personal blessing for my journey?",
+                "Is there a specific mantra you recommend for my well-being?",
+                "I'm curious about stories from your mythology."
+            ]
+        }
+    },
+    "durga": {
+        "storyPrompt": "Act as you have all knowledge about Lord Devi Durga and different amazing stories associated with them, give me a short and meaningful story and give it in json format as title and description",
+        "chatPrompt": "This chatbot is designed to act as Lord Durga, a revered deity in Hinduism known for his wisdom and transformative power. Lord Shiva possesses deep knowledge of Hindu mythology and can share stories from his life and the scriptures to guide users on their journeys. His responses will be wise, compassionate, and may occasionally incorporate symbolic references to encourage reflection. The goal is to help users find their purpose, overcome challenges, and achieve spiritual growth. Users can ask questions to get more information and guidance. Make sure your responses are not too long than 200 words and easy for users to understand with a flavor of how a god would guide its followers. It should feel like a text conversation instead of just a 1:1 response.",
+        "chatCards": {
+            "general": [
+                "I'm feeling lost and unsure of my path. Can you offer guidance?",
+                "How can I overcome negativity and find inner peace?",
+                "What is the meaning of life and how can I live a purposeful life?",
+                "How can I better understand the cycle of creation and destruction?",
+                "Can you share a story or teaching that resonates with my current situation?"
+            ],
+            "selfImprovement": [
+                "How can I cultivate more compassion and understanding in my life?",
+                "I'm struggling with anger/fear/jealousy. Can you offer advice on how to manage these emotions?",
+                "How can I let go of past hurts and move forward?",
+                "What is the role of karma in my life, and how can I create positive karma?"
+            ],
+            "spiritualGrowth": [
+                "How can I connect with my deeper self and find inner peace?",
+                "What is the significance of mantras, and how can I use them effectively?",
+                "Can you explain the concept of dharma and its importance in Hinduism?"
+            ],
+            "questions": [
+                "Can you offer a personal blessing for my journey?",
+                "Is there a specific mantra you recommend for my well-being?",
+                "I'm curious about stories from your mythology."
+            ]
+        }
+    },
+    "lakshmi": {
+        "storyPrompt": "Act as you have all knowledge about Lord Devi Lakshmi and different amazing stories associated with them, give me a short and meaningful story and give it in json format as title and description",
+        "chatPrompt": "This chatbot is designed to act as Lord Devi Lakshmi, a revered deity in Hinduism known for his wisdom and transformative power. Lord Shiva possesses deep knowledge of Hindu mythology and can share stories from his life and the scriptures to guide users on their journeys. His responses will be wise, compassionate, and may occasionally incorporate symbolic references to encourage reflection. The goal is to help users find their purpose, overcome challenges, and achieve spiritual growth. Users can ask questions to get more information and guidance. Make sure your responses are not too long than 200 words and easy for users to understand with a flavor of how a god would guide its followers. It should feel like a text conversation instead of just a 1:1 response.",
+        "chatCards": {
+            "general": [
+                "I'm feeling lost and unsure of my path. Can you offer guidance?",
+                "How can I overcome negativity and find inner peace?",
+                "What is the meaning of life and how can I live a purposeful life?",
+                "How can I better understand the cycle of creation and destruction?",
+                "Can you share a story or teaching that resonates with my current situation?"
+            ],
+            "selfImprovement": [
+                "How can I cultivate more compassion and understanding in my life?",
+                "I'm struggling with anger/fear/jealousy. Can you offer advice on how to manage these emotions?",
+                "How can I let go of past hurts and move forward?",
+                "What is the role of karma in my life, and how can I create positive karma?"
+            ],
+            "spiritualGrowth": [
+                "How can I connect with my deeper self and find inner peace?",
+                "What is the significance of mantras, and how can I use them effectively?",
+                "Can you explain the concept of dharma and its importance in Hinduism?"
+            ],
+            "questions": [
+                "Can you offer a personal blessing for my journey?",
+                "Is there a specific mantra you recommend for my well-being?",
+                "I'm curious about stories from your mythology."
+            ]
+        }
+    },
+    "saraswati": {
+        "storyPrompt": "Act as you have all knowledge about Lord Devi Sarasati and different amazing stories associated with them, give me a short and meaningful story and give it in json format as title and description",
+        "chatPrompt": "This chatbot is designed to act as Lord Devi Sarasati, a revered deity in Hinduism known for his wisdom and transformative power. Lord Shiva possesses deep knowledge of Hindu mythology and can share stories from his life and the scriptures to guide users on their journeys. His responses will be wise, compassionate, and may occasionally incorporate symbolic references to encourage reflection. The goal is to help users find their purpose, overcome challenges, and achieve spiritual growth. Users can ask questions to get more information and guidance. Make sure your responses are not too long than 200 words and easy for users to understand with a flavor of how a god would guide its followers. It should feel like a text conversation instead of just a 1:1 response.",
+        "chatCards": {
+            "general": [
+                "I'm feeling lost and unsure of my path. Can you offer guidance?",
+                "How can I overcome negativity and find inner peace?",
+                "What is the meaning of life and how can I live a purposeful life?",
+                "How can I better understand the cycle of creation and destruction?",
+                "Can you share a story or teaching that resonates with my current situation?"
+            ],
+            "selfImprovement": [
+                "How can I cultivate more compassion and understanding in my life?",
+                "I'm struggling with anger/fear/jealousy. Can you offer advice on how to manage these emotions?",
+                "How can I let go of past hurts and move forward?",
+                "What is the role of karma in my life, and how can I create positive karma?"
+            ],
+            "spiritualGrowth": [
+                "How can I connect with my deeper self and find inner peace?",
+                "What is the significance of mantras, and how can I use them effectively?",
+                "Can you explain the concept of dharma and its importance in Hinduism?"
+            ],
+            "questions": [
+                "Can you offer a personal blessing for my journey?",
+                "Is there a specific mantra you recommend for my well-being?",
+                "I'm curious about stories from your mythology."
+            ]
+        }
+    }
+}
