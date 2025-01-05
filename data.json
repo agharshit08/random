@@ -1,29 +1,17 @@
-import org.springframework.web.multipart.MultipartFile;
+private static final String FIELD_REGEX = "^\\{\\{[a-zA-Z0-9_-]+\\}\\}$";
 
-public class FileValidationUtil {
+    // Compile the regex pattern
+    private static final Pattern PATTERN = Pattern.compile(FIELD_REGEX);
 
-    public static void validateDocFile(MultipartFile file) {
-        // Check if the file is not empty
-        if (file.isEmpty()) {
-            throw new IllegalArgumentException("File is empty.");
+    /**
+     * Validates whether the input string matches the required format.
+     *
+     * @param field the string to validate
+     * @return true if the string is valid, false otherwise
+     */
+    public static boolean isValidField(String field) {
+        if (field == null || field.isEmpty()) {
+            return false; // Null or empty strings are invalid
         }
-
-        // Get the original file name
-        String fileName = file.getOriginalFilename();
-
-        if (fileName == null || fileName.isBlank()) {
-            throw new IllegalArgumentException("File name is invalid.");
-        }
-
-        // Validate file name and extension
-        if (!isValidDocFile(fileName)) {
-            throw new IllegalArgumentException("Invalid file type. Only .doc and .docx files are allowed.");
-        }
+        return PATTERN.matcher(field).matches();
     }
-
-    private static boolean isValidDocFile(String fileName) {
-        // Regular expression to match .doc or .docx files only
-        String regex = "^[^\\s]+(\\.(?i)(doc|docx))$";
-        return fileName.matches(regex);
-    }
-}
