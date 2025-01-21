@@ -1,17 +1,1 @@
-private static final String FIELD_REGEX = "^\{\{[a-zA-Z0-9_-]{2,100}\}\}$";
-
-    // Compile the regex pattern
-    private static final Pattern PATTERN = Pattern.compile(FIELD_REGEX);
-
-    /**
-     * Validates whether the input string matches the required format.
-     *
-     * @param field the string to validate
-     * @return true if the string is valid, false otherwise
-     */
-    public static boolean isValidField(String field) {
-        if (field == null || field.isEmpty()) {
-            return false; // Null or empty strings are invalid
-        }
-        return PATTERN.matcher(field).matches();
-    }
+{}
