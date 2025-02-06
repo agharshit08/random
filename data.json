@@ -1,111 +1,43 @@
-import org.apache.poi.hwpf.HWPFDocument;
-import org.apache.poi.hwpf.extractor.WordExtractor;
-import org.apache.poi.xwpf.usermodel.*;
+public static void mergeDocxToPdf(List<DocumentModel> documents, String outputPdf) throws Exception {
+    List<String> pdfFiles = new ArrayList<>();
 
-import java.io.*;
-import java.util.Base64;
-import java.util.List;
+    // Step 1: Convert each DOCX to PDF
+    for (DocumentModel doc : documents) {
+        byte[] decodedBytes = Base64.getDecoder().decode(doc.getFileContent());
+        try (InputStream is = new ByteArrayInputStream(decodedBytes);
+             XWPFDocument wordDoc = new XWPFDocument(is)) {
 
-class Document {
-    private String fileName;
-    private String base64Content; // Base64 encoded content
-
-    public Document(String fileName, String base64Content) {
-        this.fileName = fileName;
-        this.base64Content = base64Content;
+            String pdfPath = "temp_" + UUID.randomUUID() + ".pdf";
+            convertDocxToPdf(wordDoc, pdfPath);
+            pdfFiles.add(pdfPath);
+        }
     }
 
-    public String getFileName() {
-        return fileName;
-    }
+    // Step 2: Merge PDFs
+    mergePdfs(pdfFiles, outputPdf);
 
-    public byte[] getDecodedContent() {
-        return Base64.getDecoder().decode(base64Content);
+    // Step 3: Cleanup temp PDF files
+    pdfFiles.forEach(file -> new File(file).delete());
+}
+
+private static void convertDocxToPdf(XWPFDocument docx, String outputPdf) throws Exception {
+    try (FileOutputStream fos = new FileOutputStream(outputPdf);
+         PdfWriter writer = new PdfWriter(fos);
+         PdfDocument pdfDoc = new PdfDocument(writer);
+         Document document = new Document(pdfDoc)) {
+
+        docx.getParagraphs().forEach(p -> document.add(new Paragraph(p.getText())));
     }
 }
 
-public class MergeDocuments {
-    public static void main(String[] args) throws Exception {
-        // Example: List of Base64-encoded documents
-        List<Document> documents = List.of(
-            new Document("file1.docx", "BASE64_ENCODED_STRING_1"),
-            new Document("file2.doc", "BASE64_ENCODED_STRING_2")
-        );
+private static void mergePdfs(List<String> pdfFiles, String outputPdf) throws IOException {
+    try (PdfDocument mergedPdf = new PdfDocument(new PdfWriter(outputPdf))) {
+        PdfMerger merger = new PdfMerger(mergedPdf);
 
-        byte[] mergedDoc = mergeDocuments(documents);
-        try (FileOutputStream fos = new FileOutputStream("merged_document.docx")) {
-            fos.write(mergedDoc);
-        }
-        System.out.println("Merged document saved as merged_document.docx");
-    }
-
-    public static byte[] mergeDocuments(List<Document> documents) throws Exception {
-        XWPFDocument mergedDoc = new XWPFDocument();
-
-        for (Document doc : documents) {
-            byte[] decodedBytes = doc.getDecodedContent();
-            try (ByteArrayInputStream bais = new ByteArrayInputStream(decodedBytes)) {
-                if (doc.getFileName().endsWith(".docx")) {
-                    appendDocx(mergedDoc, new XWPFDocument(bais));
-                } else if (doc.getFileName().endsWith(".doc")) {
-                    appendDoc(mergedDoc, new HWPFDocument(bais));
-                }
+        for (String pdfFile : pdfFiles) {
+            try (PdfDocument pdf = new PdfDocument(new PdfReader(pdfFile))) {
+                merger.merge(pdf, 1, pdf.getNumberOfPages());
             }
         }
-
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-            mergedDoc.write(baos);
-            return baos.toByteArray();
-        }
-    }
-
-    private static void appendDocx(XWPFDocument mergedDoc, XWPFDocument docToMerge) {
-        for (XWPFParagraph p : docToMerge.getParagraphs()) {
-            XWPFParagraph newPara = mergedDoc.createParagraph();
-            newPara.setAlignment(p.getAlignment());
-            XWPFRun newRun = newPara.createRun();
-            for (XWPFRun run : p.getRuns()) {
-                newRun.setText(run.getText(0), 0);
-                newRun.setBold(run.isBold());
-                newRun.setItalic(run.isItalic());
-                newRun.setFontSize(run.getFontSize());
-            }
-        }
-    }
-
-    private static void appendDoc(XWPFDocument mergedDoc, HWPFDocument docToMerge) {
-        WordExtractor extractor = new WordExtractor(docToMerge);
-        String text = extractor.getText();
-        XWPFParagraph para = mergedDoc.createParagraph();
-        XWPFRun run = para.createRun();
-        run.setText(text);
     }
 }
-
-
-<dependencies>
-    <dependency>
-        <groupId>org.apache.poi</groupId>
-        <artifactId>poi-ooxml</artifactId>
-        <version>5.2.3</version>
-        <exclusions>
-            <exclusion>
-                <groupId>commons-io</groupId>
-                <artifactId>commons-io</artifactId>
-            </exclusion>
-        </exclusions>
-    </dependency>
-
-    <dependency>
-        <groupId>org.apache.poi</groupId>
-        <artifactId>poi-scratchpad</artifactId>
-        <version>5.2.3</version>
-        <exclusions>
-            <exclusion>
-                <groupId>commons-io</groupId>
-                <artifactId>commons-io</artifactId>
-            </exclusion>
-        </exclusions>
-    </dependency>
-</dependencies>
-
