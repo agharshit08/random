@@ -1,7 +1,8 @@
+
 public static void mergeDocxToPdf(List<DocumentModel> documents, String outputPdf) throws Exception {
     List<String> pdfFiles = new ArrayList<>();
 
-    // Step 1: Convert each DOCX to PDF
+    // Step 1: Convert each DOCX to a temporary PDF
     for (DocumentModel doc : documents) {
         byte[] decodedBytes = Base64.getDecoder().decode(doc.getFileContent());
         try (InputStream is = new ByteArrayInputStream(decodedBytes);
@@ -13,36 +14,46 @@ public static void mergeDocxToPdf(List<DocumentModel> documents, String outputPd
         }
     }
 
-    // Step 2: Merge PDFs
-    mergePdfs(pdfFiles, outputPdf);
+    // Step 2: Merge PDFs using PDFBox
+    mergePdfsWithPdfBox(pdfFiles, outputPdf);
 
     // Step 3: Cleanup temp PDF files
     pdfFiles.forEach(file -> new File(file).delete());
 }
 
 private static void convertDocxToPdf(XWPFDocument docx, String outputPdf) throws Exception {
-    try (FileOutputStream fos = new FileOutputStream(outputPdf);
-         PdfWriter writer = new PdfWriter(fos);
-         PdfDocument pdfDoc = new PdfDocument(writer);
-         Document document = new Document(pdfDoc)) {
+    try (PDDocument pdfDocument = new PDDocument()) {
+        PDPage page = new PDPage();
+        pdfDocument.addPage(page);
 
-        docx.getParagraphs().forEach(p -> document.add(new Paragraph(p.getText())));
-    }
-}
+        PDPageContentStream contentStream = new PDPageContentStream(pdfDocument, page);
+        contentStream.beginText();
+        contentStream.setFont(PDType1Font.HELVETICA, 12);
+        contentStream.newLineAtOffset(50, 700);
 
-private static void mergePdfs(List<String> pdfFiles, String outputPdf) throws IOException {
-    try (PdfDocument mergedPdf = new PdfDocument(new PdfWriter(outputPdf))) {
-        PdfMerger merger = new PdfMerger(mergedPdf);
-
-        for (String pdfFile : pdfFiles) {
-            try (PdfDocument pdf = new PdfDocument(new PdfReader(pdfFile))) {
-                merger.merge(pdf, 1, pdf.getNumberOfPages());
-            }
+        // Extract paragraphs from DOCX and write to PDF
+        for (XWPFParagraph para : docx.getParagraphs()) {
+            contentStream.showText(para.getText());
+            contentStream.newLineAtOffset(0, -15);
         }
+
+        contentStream.endText();
+        contentStream.close();
+
+        pdfDocument.save(outputPdf);
     }
 }
 
+private static void mergePdfsWithPdfBox(List<String> pdfFiles, String outputPdf) throws IOException {
+    PDFMergerUtility merger = new PDFMergerUtility();
+    merger.setDestinationFileName(outputPdf);
 
+    for (String pdfFile : pdfFiles) {
+        merger.addSource(pdfFile);
+    }
+
+    merger.mergeDocuments(null);
+}
 
 <dependencies>
     <!-- Apache POI for handling Word documents -->
