@@ -10,104 +10,27 @@ import java.util.Base64;
 import java.util.List;
 import java.io.IOException;
 
-public class DocumentMerger {
+public static String writeMergedPdfToResources(byte[] pdfContent) throws IOException {
+    // Get the project's resources directory
+    String resourcePath = "src/main/resources";
     
-    public static byte[] mergeDocumentsToPdf(List<com.your.package.Document> documents) throws IOException {
-        // Create PDF document
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        PdfWriter writer = new PdfWriter(outputStream);
-        PdfDocument pdfDoc = new PdfDocument(writer);
-        Document document = new Document(pdfDoc);
-        
-        for (com.your.package.Document doc : documents) {
-            // Decode base64 content
-            byte[] decodedContent = Base64.getDecoder().decode(doc.getFileContent());
-            
-            // Load DOCX document
-            XWPFDocument docxDocument = new XWPFDocument(new ByteArrayInputStream(decodedContent));
-            
-            // Process each paragraph
-            for (XWPFParagraph paragraph : docxDocument.getParagraphs()) {
-                Paragraph pdfParagraph = new Paragraph();
-                
-                // Preserve paragraph alignment
-                switch (paragraph.getAlignment()) {
-                    case CENTER:
-                        pdfParagraph.setTextAlignment(com.itextpdf.layout.property.TextAlignment.CENTER);
-                        break;
-                    case RIGHT:
-                        pdfParagraph.setTextAlignment(com.itextpdf.layout.property.TextAlignment.RIGHT);
-                        break;
-                    default:
-                        pdfParagraph.setTextAlignment(com.itextpdf.layout.property.TextAlignment.LEFT);
-                }
-                
-                // Process runs within paragraph
-                for (XWPFRun run : paragraph.getRuns()) {
-                    Text text = new Text(run.getText(0));
-                    
-                    // Preserve formatting
-                    if (run.isBold()) {
-                        text.setBold();
-                    }
-                    if (run.isItalic()) {
-                        text.setItalic();
-                    }
-                    if (run.getUnderline() != UnderlinePatterns.NONE) {
-                        text.setUnderline();
-                    }
-                    
-                    // Set font size
-                    if (run.getFontSize() != -1) {
-                        text.setFontSize(run.getFontSize());
-                    }
-                    
-                    pdfParagraph.add(text);
-                }
-                
-                document.add(pdfParagraph);
-            }
-            
-            // Process tables
-            for (XWPFTable table : docxDocument.getTables()) {
-                Table pdfTable = new Table(table.getRow(0).getTableCells().size());
-                
-                for (XWPFTableRow row : table.getRows()) {
-                    for (XWPFTableCell cell : row.getTableCells()) {
-                        Cell pdfCell = new Cell();
-                        
-                        // Process cell content
-                        for (XWPFParagraph paragraph : cell.getParagraphs()) {
-                            Paragraph cellParagraph = new Paragraph();
-                            for (XWPFRun run : paragraph.getRuns()) {
-                                Text text = new Text(run.getText(0));
-                                if (run.isBold()) text.setBold();
-                                if (run.isItalic()) text.setItalic();
-                                cellParagraph.add(text);
-                            }
-                            pdfCell.add(cellParagraph);
-                        }
-                        
-                        pdfTable.addCell(pdfCell);
-                    }
-                }
-                
-                document.add(pdfTable);
-            }
-            
-            // Add page break between documents
-            document.add(new AreaBreak());
-        }
-        
-        document.close();
-        return outputStream.toByteArray();
+    // Create a directory for merged documents if it doesn't exist
+    Path mergedDocsDir = Paths.get(resourcePath, "merged-documents");
+    if (!Files.exists(mergedDocsDir)) {
+        Files.createDirectories(mergedDocsDir);
     }
+    
+    // Generate unique filename with timestamp
+    String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+    String fileName = "merged_document_" + timestamp + ".pdf";
+    
+    // Create the full file path
+    Path filePath = mergedDocsDir.resolve(fileName);
+    
+    // Write the PDF content to file
+    try (FileOutputStream fos = new FileOutputStream(filePath.toFile())) {
+        fos.write(pdfContent);
+    }
+    
+    return filePath.toString();
 }
-
-
-<dependency>
-        <groupId>com.itextpdf</groupId>
-        <artifactId>itext7-core</artifactId>
-        <version>7.2.5</version>
-        <type>pom</type>
-    </dependency>
