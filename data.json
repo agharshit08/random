@@ -10,27 +10,122 @@ import java.util.Base64;
 import java.util.List;
 import java.io.IOException;
 
-public static String writeMergedPdfToResources(byte[] pdfContent) throws IOException {
-    // Get the project's resources directory
-    String resourcePath = "src/main/resources";
+public class DocumentMerger {
     
-    // Create a directory for merged documents if it doesn't exist
-    Path mergedDocsDir = Paths.get(resourcePath, "merged-documents");
-    if (!Files.exists(mergedDocsDir)) {
-        Files.createDirectories(mergedDocsDir);
+    public static byte[] mergeDocumentsToPdf(List<com.your.package.Document> documents) throws IOException {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        PdfWriter writer = new PdfWriter(outputStream);
+        PdfDocument pdfDoc = new PdfDocument(writer);
+        Document document = new Document(pdfDoc);
+        
+        for (com.your.package.Document doc : documents) {
+            byte[] decodedContent = Base64.getDecoder().decode(doc.getFileContent());
+            XWPFDocument docxDocument = new XWPFDocument(new ByteArrayInputStream(decodedContent));
+            
+            for (XWPFParagraph paragraph : docxDocument.getParagraphs()) {
+                Paragraph pdfParagraph = new Paragraph();
+                
+                switch (paragraph.getAlignment()) {
+                    case CENTER:
+                        pdfParagraph.setTextAlignment(com.itextpdf.layout.property.TextAlignment.CENTER);
+                        break;
+                    case RIGHT:
+                        pdfParagraph.setTextAlignment(com.itextpdf.layout.property.TextAlignment.RIGHT);
+                        break;
+                    default:
+                        pdfParagraph.setTextAlignment(com.itextpdf.layout.property.TextAlignment.LEFT);
+                }
+                
+                for (XWPFRun run : paragraph.getRuns()) {
+                    String runText = run.getText(0);
+                    
+                    // Skip if run text is null
+                    if (runText == null) {
+                        continue;
+                    }
+                    
+                    // Handle special characters
+                    if (runText.equals("\t")) {
+                        // Add tab space (you can adjust the number of spaces)
+                        pdfParagraph.add(new Text("    "));
+                        continue;
+                    }
+                    
+                    // Handle other special characters if needed
+                    runText = runText.replace("\r", "")
+                                   .replace("\n", "");
+                    
+                    Text text = new Text(runText);
+                    
+                    if (run.isBold()) {
+                        text.setBold();
+                    }
+                    if (run.isItalic()) {
+                        text.setItalic();
+                    }
+                    if (run.getUnderline() != UnderlinePatterns.NONE) {
+                        text.setUnderline();
+                    }
+                    
+                    if (run.getFontSize() != -1) {
+                        text.setFontSize(run.getFontSize());
+                    }
+                    
+                    pdfParagraph.add(text);
+                }
+                
+                // Only add paragraph if it contains content
+                if (pdfParagraph.getChildren().size() > 0) {
+                    document.add(pdfParagraph);
+                }
+            }
+            
+            // Process tables
+            for (XWPFTable table : docxDocument.getTables()) {
+                Table pdfTable = new Table(table.getRow(0).getTableCells().size());
+                
+                for (XWPFTableRow row : table.getRows()) {
+                    for (XWPFTableCell cell : row.getTableCells()) {
+                        Cell pdfCell = new Cell();
+                        
+                        for (XWPFParagraph paragraph : cell.getParagraphs()) {
+                            Paragraph cellParagraph = new Paragraph();
+                            for (XWPFRun run : paragraph.getRuns()) {
+                                String runText = run.getText(0);
+                                
+                                if (runText == null) {
+                                    continue;
+                                }
+                                
+                                if (runText.equals("\t")) {
+                                    cellParagraph.add(new Text("    "));
+                                    continue;
+                                }
+                                
+                                runText = runText.replace("\r", "")
+                                               .replace("\n", "");
+                                
+                                Text text = new Text(runText);
+                                if (run.isBold()) text.setBold();
+                                if (run.isItalic()) text.setItalic();
+                                cellParagraph.add(text);
+                            }
+                            if (cellParagraph.getChildren().size() > 0) {
+                                pdfCell.add(cellParagraph);
+                            }
+                        }
+                        
+                        pdfTable.addCell(pdfCell);
+                    }
+                }
+                
+                document.add(pdfTable);
+            }
+            
+            document.add(new AreaBreak());
+        }
+        
+        document.close();
+        return outputStream.toByteArray();
     }
-    
-    // Generate unique filename with timestamp
-    String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
-    String fileName = "merged_document_" + timestamp + ".pdf";
-    
-    // Create the full file path
-    Path filePath = mergedDocsDir.resolve(fileName);
-    
-    // Write the PDF content to file
-    try (FileOutputStream fos = new FileOutputStream(filePath.toFile())) {
-        fos.write(pdfContent);
-    }
-    
-    return filePath.toString();
 }
