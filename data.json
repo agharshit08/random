@@ -1,10 +1,23 @@
-podman run -d \
-  --name localstack \
-  -p 4566:4566 \
-  -p 4510-4559:4510-4559 \
-  -e SERVICES=s3,dynamodb,lambda \
-  -e DEBUG=1 \
-  -e DATA_DIR=/tmp/localstack/data \
-  -e SKIP_SSL_CERT_DOWNLOAD=1 \
-  --network bridge \
-  localstack/localstack
+public static List<TemplateDetails> processTemplates(List<TemplateDetails> templates) {
+    return templates.stream()
+        // First group by name
+        .collect(Collectors.groupingBy(TemplateDetails::getName))
+        .values()
+        .stream()
+        .map(templatesForName -> {
+            // Find highest templateVersion for this name
+            Long maxTemplateVersion = templatesForName.stream()
+                .map(TemplateDetails::getTemplateVersion)
+                .max(Long::compareTo)
+                .orElse(0L);
+            
+            // Filter to only entries with highest templateVersion and latest=true
+            return templatesForName.stream()
+                .filter(t -> t.getTemplateVersion().equals(maxTemplateVersion))
+                .filter(TemplateDetails::isLatest)
+                .findFirst()
+                .orElse(null);
+        })
+        .filter(Objects::nonNull)
+        .collect(Collectors.toList());
+}
