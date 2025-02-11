@@ -2,9 +2,7 @@ podman run -d \
   --name localstack \
   -p 4566:4566 \
   -p 4510-4559:4510-4559 \
-  -e DOCKER_HOST=unix:///var/run/docker.sock \
-  -e HOSTNAME_EXTERNAL=localhost \
-  -e LAMBDA_EXECUTOR=docker \
+  -e SERVICES=s3,dynamodb,lambda \
   -e DEBUG=1 \
   -e DATA_DIR=/tmp/localstack/data \
   localstack/localstack
