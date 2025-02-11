@@ -5,4 +5,6 @@ podman run -d \
   -e SERVICES=s3,dynamodb,lambda \
   -e DEBUG=1 \
   -e DATA_DIR=/tmp/localstack/data \
+  -e SKIP_SSL_CERT_DOWNLOAD=1 \
+  --network bridge \
   localstack/localstack
