@@ -7,3 +7,26 @@ PODMAN_ARGS="--tls-verify=false" podman-compose up -d
 podman-compose down
 podman container stop localstack || true
 podman container rm localstack || true
+
+
+mkdir -p ~/localstack-data
+
+version: "3.8"
+services:
+  localstack:
+    container_name: localstack
+    image: localstack/localstack
+    ports:
+      - "4566:4566"
+      - "4571:4571"
+    environment:
+      - SERVICES=s3,dynamodb,lambda
+      - DEBUG=1
+      - DATA_DIR=/tmp/localstack/data
+    volumes:
+      - ~/localstack-data:/tmp/localstack
+
+
+PODMAN_ARGS="--tls-verify=false" podman-compose up -d
+
+podman logs localstack
