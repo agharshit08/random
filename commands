@@ -61,3 +61,28 @@ PODMAN_ARGS="--tls-verify=false" podman-compose up -d
 
 
 TMPDIR=~/localstack-tmp PODMAN_ARGS="--tls-verify=false" podman-compose up -d
+
+
+---
+version: "3.8"
+services:
+  localstack:
+    container_name: localstack
+    image: localstack/localstack
+    ports:
+      - "4566:4566"
+      - "4571:4571"
+    environment:
+      - SERVICES=s3,dynamodb,lambda
+      - DEBUG=1
+      - SKIP_SSL_CERT_DOWNLOAD=1  # Skip SSL cert download
+      - DISABLE_CORS_CHECKS=1
+      - LAMBDA_EXECUTOR=local
+      - DOCKER_HOST=unix:///var/run/podman.sock  # Use podman socket instead
+      - GATEWAY_LISTEN=0.0.0.0:4566
+      - USE_SSL=0  # Disable SSL
+      - DISABLE_EVENTS=1
+    volumes:
+      - localstack_tmp:/tmp/localstack
+volumes:
+  localstack_tmp:
