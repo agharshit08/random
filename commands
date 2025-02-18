@@ -3,3 +3,7 @@ podman pull --tls-verify=false docker.io/localstack/localstack
 
 
 PODMAN_ARGS="--tls-verify=false" podman-compose up -d
+
+podman-compose down
+podman container stop localstack || true
+podman container rm localstack || true
