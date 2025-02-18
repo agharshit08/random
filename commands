@@ -1,39 +1,69 @@
-<dependency>
-    <groupId>org.docx4j</groupId>
-    <artifactId>docx4j</artifactId>
-    <version>6.1.1</version>
-    <exclusions>
-        <!-- Exclude conflicting logging implementations -->
-        <exclusion>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-        </exclusion>
-        <exclusion>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-        </exclusion>
-        <exclusion>
-            <groupId>org.slf4j</groupId>
-            <artifactId>jcl-over-slf4j</artifactId>
-        </exclusion>
-        <exclusion>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-reload4j</artifactId>
-        </exclusion>
-        <exclusion>
-            <groupId>ch.qos.reload4j</groupId>
-            <artifactId>reload4j</artifactId>
-        </exclusion>
-    </exclusions>
-</dependency>
+import org.apache.poi.xwpf.usermodel.XWPFDocument;
+import org.docx4j.Docx4J;
+import org.docx4j.convert.out.pdf.PdfConversion;
+import org.docx4j.convert.out.pdf.viaXSLFO.Conversion;
+import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.pdf.PdfCopy;
+import com.itextpdf.text.pdf.PdfReader;
 
-<!-- Then add a single logging implementation -->
-<dependency>
-    <groupId>ch.qos.logback</groupId>
-    <artifactId>logback-classic</artifactId>
-    <version>1.4.11</version>
-</dependency>
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
 
-mvn clean
-rm -rf ~/.m2/repository/org/docx4j
-mvn install -DskipTests
+public class DocumentMerger {
+
+    public byte[] mergeDocuments(List<Document> documents) throws Exception {
+        ByteArrayOutputStream mergedPdfOutputStream = new ByteArrayOutputStream();
+        Document pdfDocument = new Document();
+        PdfCopy copy = new PdfCopy(pdfDocument, mergedPdfOutputStream);
+        pdfDocument.open();
+
+        for (Document doc : documents) {
+            // Convert DOCX to PDF
+            byte[] pdfBytes = convertDocxToPdf(doc.getContent());
+            PdfReader reader = new PdfReader(pdfBytes);
+            copy.addDocument(reader);
+            reader.close();
+        }
+
+        pdfDocument.close();
+        return mergedPdfOutputStream.toByteArray();
+    }
+
+    private byte[] convertDocxToPdf(byte[] docxContent) throws Exception {
+        InputStream inputStream = new ByteArrayInputStream(docxContent);
+        WordprocessingMLPackage wordMLPackage = WordprocessingMLPackage.load(inputStream);
+        ByteArrayOutputStream pdfOutputStream = new ByteArrayOutputStream();
+
+        // Convert DOCX to PDF using docx4j
+        PdfConversion pdfConversion = new Conversion(wordMLPackage);
+        pdfConversion.output(pdfOutputStream, Docx4J.FLAG_EXPORT_PREFER_XSL);
+
+        return pdfOutputStream.toByteArray();
+    }
+}
+
+---
+<dependency>
+        <groupId>javax.xml.bind</groupId>
+        <artifactId>jaxb-api</artifactId>
+        <version>2.3.1</version>
+    </dependency>
+    <dependency>
+        <groupId>com.sun.xml.bind</groupId>
+        <artifactId>jaxb-core</artifactId>
+        <version>2.3.0.1</version>
+    </dependency>
+    <dependency>
+        <groupId>com.sun.xml.bind</groupId>
+        <artifactId>jaxb-impl</artifactId>
+        <version>2.3.1</version>
+    </dependency>
+    <dependency>
+        <groupId>javax.activation</groupId>
+        <artifactId>activation</artifactId>
+        <version>1.1.1</version>
+    </dependency>
