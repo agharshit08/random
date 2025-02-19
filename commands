@@ -1,77 +1,53 @@
-<!-- Apache POI -->
-<dependency>
-    <groupId>org.apache.poi</groupId>
-    <artifactId>poi-ooxml</artifactId>
-    <version>5.2.5</version>  <!-- Use the latest version -->
-</dependency>
-<dependency>
-    <groupId>fr.opensagres.xdocreport</groupId>
-    <artifactId>fr.opensagres.xdocreport.converter.docx.xwpf</artifactId>
-    <version>2.0.4</version> <!-- Or latest compatible version -->
-</dependency>
+import com.itextpdf.kernel.pdf.*;
+import com.itextpdf.layout.Document;
+import com.itextpdf.layout.element.*;
+import org.apache.poi.xwpf.usermodel.*;
+import org.springframework.stereotype.Service;
+import java.io.*;
+import java.util.List;
 
-<!-- iText 7 -->
-<dependency>
-    <groupId>com.itextpdf</groupId>
-    <artifactId>html2pdf</artifactId>
-    <version>5.0.1</version>  <!--  Use the latest version -->
-</dependency>
+@Service
+public class DocxToPdfService {
 
-<dependency>
-    <groupId>com.itextpdf</groupId>
-    <artifactId>itext7-core</artifactId>
-    <version>7.2.5</version>  <!--  Use the latest version -->
-</dependency>
+    public byte[] convertDocxToPdf(byte[] docxContent) throws IOException {
+        // Load DOCX from byte[]
+        ByteArrayInputStream docxInputStream = new ByteArrayInputStream(docxContent);
+        XWPFDocument document = new XWPFDocument(docxInputStream);
 
+        // Create PDF in-memory
+        ByteArrayOutputStream pdfOutputStream = new ByteArrayOutputStream();
+        PdfWriter writer = new PdfWriter(pdfOutputStream);
+        PdfDocument pdf = new PdfDocument(writer);
+        Document pdfDocument = new Document(pdf);
 
----
-    public byte[] convertDocxToPdf(byte[] docxContent) {
-        try (ByteArrayInputStream inputStream = new ByteArrayInputStream(docxContent);
-             ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-
-            // Load the DOCX document using Apache POI
-            XWPFDocument document = new XWPFDocument(inputStream);
-
-            // Configure XHTML options for conversion
-            XHTMLOptions options = XHTMLOptions.create();
-            options.setFragment(true);  // Important: treat DOCX as a fragment
-            options.setIgnoreStylesIfUnused(true);
-
-
-            // Convert DOCX to XHTML
-            ByteArrayOutputStream htmlOutputStream = new ByteArrayOutputStream();
-            XHTMLConverter.getInstance().convert(document, htmlOutputStream, options);
-
-            // Get the XHTML content as a string
-            String htmlContent = htmlOutputStream.toString(StandardCharsets.UTF_8);
-
-            // Use iText to convert XHTML to PDF
-            convertToPdf(htmlContent, outputStream);
-
-            return outputStream.toByteArray();
-
-        } catch (Exception e) {
-            System.err.println("Error converting DOCX to PDF: " + e.getMessage());
-            e.printStackTrace();
-            return null;
+        // Process paragraphs and tables
+        for (IBodyElement element : document.getBodyElements()) {
+            if (element instanceof XWPFParagraph) {
+                XWPFParagraph paragraph = (XWPFParagraph) element;
+                pdfDocument.add(new Paragraph(paragraph.getText()));
+            } else if (element instanceof XWPFTable) {
+                pdfDocument.add(convertTable((XWPFTable) element));
+            }
         }
-    }
 
-
-    private void convertToPdf(String htmlContent, OutputStream outputStream) throws Exception {
-
-        // iText 7 configuration
-        ConverterProperties converterProperties = new ConverterProperties();
-
-        // Use default fonts for broader compatibility. You might want to embed specific fonts if required.
-        PdfFont defaultFont = PdfFontFactory.createFont("Helvetica", PdfEncodings.WINANSI, true);  // or PdfEncodings.IDENTITY_H
-        converterProperties.setDefaultFont(defaultFont);
-
-
-        // Create PDF document
-        PdfDocument pdfDocument = new PdfDocument(new PdfWriter(outputStream));
-
-        // Convert HTML to PDF using iText's HTML converter
-        HtmlConverter.convertToPdf(htmlContent, pdfDocument, converterProperties);
+        // Close resources
         pdfDocument.close();
+        document.close();
+
+        return pdfOutputStream.toByteArray();
     }
+
+    private Table convertTable(XWPFTable table) {
+        List<XWPFTableRow> rows = table.getRows();
+        int numCols = rows.get(0).getTableCells().size();
+        Table pdfTable = new Table(numCols);
+
+        for (XWPFTableRow row : rows) {
+            for (XWPFTableCell cell : row.getTableCells()) {
+                pdfTable.addCell(new Cell().add(new Paragraph(cell.getText())));
+            }
+        }
+
+        return pdfTable;
+    }
+}
