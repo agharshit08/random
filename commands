@@ -5,35 +5,44 @@ import org.apache.poi.xwpf.usermodel.*;
 import org.springframework.stereotype.Service;
 import java.io.*;
 import java.util.List;
+import java.util.Base64;
 
 @Service
 public class DocxToPdfService {
 
-    public byte[] convertDocxToPdf(byte[] docxContent) throws IOException {
-        // Load DOCX from byte[]
+    public byte[] convertMultipleDocxToSinglePdf(List<DocumentContent> docxList) throws IOException {
+        ByteArrayOutputStream finalPdfOutputStream = new ByteArrayOutputStream();
+        PdfWriter writer = new PdfWriter(finalPdfOutputStream);
+        PdfDocument mergedPdf = new PdfDocument(writer);
+
+        for (DocumentContent docx : docxList) {
+            byte[] decodedDocx = Base64.getDecoder().decode(docx.getContent());
+            byte[] pdfBytes = convertDocxToPdf(decodedDocx);
+            appendPdfToMergedPdf(pdfBytes, mergedPdf);
+        }
+
+        mergedPdf.close();
+        return finalPdfOutputStream.toByteArray();
+    }
+
+    private byte[] convertDocxToPdf(byte[] docxContent) throws IOException {
         ByteArrayInputStream docxInputStream = new ByteArrayInputStream(docxContent);
         XWPFDocument document = new XWPFDocument(docxInputStream);
-
-        // Create PDF in-memory
         ByteArrayOutputStream pdfOutputStream = new ByteArrayOutputStream();
         PdfWriter writer = new PdfWriter(pdfOutputStream);
         PdfDocument pdf = new PdfDocument(writer);
         Document pdfDocument = new Document(pdf);
 
-        // Process paragraphs and tables
         for (IBodyElement element : document.getBodyElements()) {
             if (element instanceof XWPFParagraph) {
-                XWPFParagraph paragraph = (XWPFParagraph) element;
-                pdfDocument.add(new Paragraph(paragraph.getText()));
+                pdfDocument.add(new Paragraph(((XWPFParagraph) element).getText()));
             } else if (element instanceof XWPFTable) {
                 pdfDocument.add(convertTable((XWPFTable) element));
             }
         }
 
-        // Close resources
         pdfDocument.close();
         document.close();
-
         return pdfOutputStream.toByteArray();
     }
 
@@ -41,13 +50,18 @@ public class DocxToPdfService {
         List<XWPFTableRow> rows = table.getRows();
         int numCols = rows.get(0).getTableCells().size();
         Table pdfTable = new Table(numCols);
-
         for (XWPFTableRow row : rows) {
             for (XWPFTableCell cell : row.getTableCells()) {
                 pdfTable.addCell(new Cell().add(new Paragraph(cell.getText())));
             }
         }
-
         return pdfTable;
+    }
+
+    private void appendPdfToMergedPdf(byte[] pdfBytes, PdfDocument mergedPdf) throws IOException {
+        PdfReader reader = new PdfReader(new ByteArrayInputStream(pdfBytes));
+        PdfDocument tempPdf = new PdfDocument(reader);
+        tempPdf.copyPagesTo(1, tempPdf.getNumberOfPages(), mergedPdf);
+        tempPdf.close();
     }
 }
