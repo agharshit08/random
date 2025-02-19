@@ -38,3 +38,5 @@
         <version>2.7.10</version>
     </dependency>
 </dependencies>
+
+System.setProperty("javax.xml.bind.context.factory", "org.eclipse.persistence.jaxb.JAXBContextFactory");
