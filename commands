@@ -1,23 +1,40 @@
-#!/bin/bash
+<dependencies>
+    <!-- DocX4J -->
+    <dependency>
+        <groupId>org.docx4j</groupId>
+        <artifactId>docx4j</artifactId>
+        <version>6.1.2</version>
+    </dependency>
+    
+    <dependency>
+        <groupId>org.docx4j</groupId>
+        <artifactId>docx4j-JAXB-MOXy</artifactId>
+        <version>6.1.2</version>
+    </dependency>
 
-# Input and output file names
-INPUT_FILE="data.b64"
-OUTPUT_FILE="output.docx"
+    <!-- JAXB Dependencies -->
+    <dependency>
+        <groupId>javax.xml.bind</groupId>
+        <artifactId>jaxb-api</artifactId>
+        <version>2.3.1</version>
+    </dependency>
 
-# Check if the input file exists
-if [ ! -f "$INPUT_FILE" ]; then
-    echo "Error: File '$INPUT_FILE' not found!"
-    exit 1
-fi
+    <dependency>
+        <groupId>org.glassfish.jaxb</groupId>
+        <artifactId>jaxb-runtime</artifactId>
+        <version>2.3.1</version>
+    </dependency>
 
-# Decode the base64 content and save as .docx
-base64 --decode "$INPUT_FILE" > "$OUTPUT_FILE"
+    <!-- Additional required dependencies -->
+    <dependency>
+        <groupId>com.sun.xml.bind</groupId>
+        <artifactId>jaxb-impl</artifactId>
+        <version>2.3.1</version>
+    </dependency>
 
-# Check if decoding was successful
-if [ $? -eq 0 ]; then
-    echo "Decoded successfully: $OUTPUT_FILE"
-    open "$OUTPUT_FILE"  # Open the file in the default app
-else
-    echo "Error: Decoding failed!"
-    exit 1
-fi
+    <dependency>
+        <groupId>com.sun.xml.bind</groupId>
+        <artifactId>jaxb-core</artifactId>
+        <version>2.3.0.1</version>
+    </dependency>
+</dependencies>
