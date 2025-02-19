@@ -1,42 +1,5 @@
-<dependencies>
-    <!-- DocX4J -->
-    <dependency>
-        <groupId>org.docx4j</groupId>
-        <artifactId>docx4j-JAXB-MOXy</artifactId>
-        <version>11.4.9</version>
-    </dependency>
-    
-    <dependency>
-        <groupId>org.docx4j</groupId>
-        <artifactId>docx4j-core</artifactId>
-        <version>11.4.9</version>
-    </dependency>
-
-    <!-- JAXB Dependencies -->
-    <dependency>
-        <groupId>javax.xml.bind</groupId>
-        <artifactId>jaxb-api</artifactId>
-        <version>2.3.1</version>
-    </dependency>
-
-    <dependency>
-        <groupId>org.glassfish.jaxb</groupId>
-        <artifactId>jaxb-runtime</artifactId>
-        <version>2.3.1</version>
-    </dependency>
-
-    <!-- Additional XML dependencies -->
-    <dependency>
-        <groupId>jakarta.xml.bind</groupId>
-        <artifactId>jakarta.xml.bind-api</artifactId>
-        <version>2.3.3</version>
-    </dependency>
-
-    <dependency>
-        <groupId>org.eclipse.persistence</groupId>
-        <artifactId>org.eclipse.persistence.moxy</artifactId>
-        <version>2.7.10</version>
-    </dependency>
-</dependencies>
-
-System.setProperty("javax.xml.bind.context.factory", "org.eclipse.persistence.jaxb.JAXBContextFactory");
+<dependency>
+    <groupId>fr.opensagres.xdocreport</groupId>
+    <artifactId>fr.opensagres.poi.xwpf.converter.pdf</artifactId>
+    <version>2.0.2</version>
+</dependency>
