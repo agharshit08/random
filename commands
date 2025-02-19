@@ -2,14 +2,14 @@
     <!-- DocX4J -->
     <dependency>
         <groupId>org.docx4j</groupId>
-        <artifactId>docx4j</artifactId>
-        <version>6.1.2</version>
+        <artifactId>docx4j-JAXB-MOXy</artifactId>
+        <version>11.4.9</version>
     </dependency>
     
     <dependency>
         <groupId>org.docx4j</groupId>
-        <artifactId>docx4j-JAXB-MOXy</artifactId>
-        <version>6.1.2</version>
+        <artifactId>docx4j-core</artifactId>
+        <version>11.4.9</version>
     </dependency>
 
     <!-- JAXB Dependencies -->
@@ -25,16 +25,16 @@
         <version>2.3.1</version>
     </dependency>
 
-    <!-- Additional required dependencies -->
+    <!-- Additional XML dependencies -->
     <dependency>
-        <groupId>com.sun.xml.bind</groupId>
-        <artifactId>jaxb-impl</artifactId>
-        <version>2.3.1</version>
+        <groupId>jakarta.xml.bind</groupId>
+        <artifactId>jakarta.xml.bind-api</artifactId>
+        <version>2.3.3</version>
     </dependency>
 
     <dependency>
-        <groupId>com.sun.xml.bind</groupId>
-        <artifactId>jaxb-core</artifactId>
-        <version>2.3.0.1</version>
+        <groupId>org.eclipse.persistence</groupId>
+        <artifactId>org.eclipse.persistence.moxy</artifactId>
+        <version>2.7.10</version>
     </dependency>
 </dependencies>
