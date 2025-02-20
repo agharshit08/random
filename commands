@@ -1,24 +1,46 @@
-private void appendDocumentContent(XWPFDocument source, XWPFDocument target) {
-        // Copy paragraphs
-        for (XWPFParagraph paragraph : source.getParagraphs()) {
-            XWPFParagraph newParagraph = target.createParagraph();
-            newParagraph.setAlignment(paragraph.getAlignment());
-            newParagraph.setStyle(paragraph.getStyle());
 
-            for (XWPFRun run : paragraph.getRuns()) {
+    private void appendDocument(XWPFDocument targetDocument, XWPFDocument sourceDocument) {
+        for (XWPFParagraph paragraph : sourceDocument.getParagraphs()) {
+            XWPFParagraph newParagraph = targetDocument.createParagraph();
+            newParagraph.setStyle(paragraph.getStyle());  // Copy style
+            newParagraph.setAlignment(paragraph.getAlignment()); // Copy alignment
+            newParagraph.setVerticalAlignment(paragraph.getVerticalAlignment());
+            newParagraph.setBorderBottom(paragraph.getBorderBottom());
+            newParagraph.setBorderLeft(paragraph.getBorderLeft());
+            newParagraph.setBorderRight(paragraph.getBorderRight());
+            newParagraph.setBorderTop(paragraph.getBorderTop());
+            newParagraph.setSpacingAfter(paragraph.getSpacingAfter());
+            newParagraph.setSpacingBefore(paragraph.getSpacingBefore());
+            newParagraph.setIndentationLeft(paragraph.getIndentationLeft());
+            newParagraph.setIndentationRight(paragraph.getIndentationRight());
+            newParagraph.setFirstLineIndent(paragraph.getFirstLineIndent());
+            newParagraph.setPageBreak(paragraph.isPageBreak());
+
+
+            List<XWPFRun> runs = paragraph.getRuns();
+            for (XWPFRun run : runs) {
                 XWPFRun newRun = newParagraph.createRun();
-                newRun.setText(run.text());
+                newRun.setText(run.getText(0));
                 newRun.setBold(run.isBold());
                 newRun.setItalic(run.isItalic());
-                newRun.setFontSize(run.getFontSize());
+                newRun.setUnderline(run.getUnderline());
                 newRun.setColor(run.getColor());
+                newRun.setFontSize(run.getFontSize());
                 newRun.setFontFamily(run.getFontFamily());
+                newRun.setStrike(run.isStrike());
+                newRun.setSubscript(run.getSubscript());
             }
         }
 
-        // Copy tables
-        for (XWPFTable table : source.getTables()) {
-            XWPFTable newTable = target.createTable();
-            newTable.getCTTbl().set(table.getCTTbl().copy());
+        // Append Tables
+        for (XWPFTable table : sourceDocument.getTables()) {
+            try {
+                targetDocument.createTable(table);  // This is the simplest way, but might not be perfect
+            } catch (Exception e) {
+                System.err.println("Error appending table: " + e.getMessage());
+                //  Handle exceptions appropriately:
+                // - Log the error
+                // - Consider using a more robust table copying method if needed.  (See alternative approaches below).
+            }
         }
     }
