@@ -1,102 +1,51 @@
 import org.apache.poi.xwpf.usermodel.*;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.util.FileCopyUtils;
+import org.springframework.stereotype.Service;
 
 import java.io.*;
 
-public class ResourceDocxMerger {
-    public byte[] mergeTwoDocuments(String firstDocPath, String secondDocPath) throws IOException {
-        // Load documents from resources
-        byte[] firstDocBytes = loadResourceFile(firstDocPath);
-        byte[] secondDocBytes = loadResourceFile(secondDocPath);
-        
-        // Create merged document
-        try (XWPFDocument mergedDoc = new XWPFDocument();
-             ByteArrayInputStream firstDocStream = new ByteArrayInputStream(firstDocBytes);
-             ByteArrayInputStream secondDocStream = new ByteArrayInputStream(secondDocBytes);
-             XWPFDocument firstDoc = new XWPFDocument(firstDocStream);
-             XWPFDocument secondDoc = new XWPFDocument(secondDocStream);
-             ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+@Service
+public class DocumentMergeService {
 
-            // Copy content from first document
-            copyDocument(firstDoc, mergedDoc);
-            
-            // Add page break between documents
+    public void mergeDocuments(String outputFileName) throws IOException {
+        // Load the documents from resources folder
+        File doc1File = new ClassPathResource("doc1.docx").getFile();
+        File doc2File = new ClassPathResource("doc2.docx").getFile();
+
+        // Read both documents
+        try (FileInputStream fis1 = new FileInputStream(doc1File);
+             FileInputStream fis2 = new FileInputStream(doc2File);
+             XWPFDocument doc1 = new XWPFDocument(fis1);
+             XWPFDocument doc2 = new XWPFDocument(fis2)) {
+
+            // Create a new document
+            XWPFDocument mergedDoc = new XWPFDocument();
+
+            // Append content from first document
+            appendDocumentContent(doc1, mergedDoc);
+
+            // Add a page break between documents
             mergedDoc.createParagraph().setPageBreak(true);
-            
-            // Copy content from second document
-            copyDocument(secondDoc, mergedDoc);
-            
-            // Write the merged document to byte array
-            mergedDoc.write(outputStream);
-            return outputStream.toByteArray();
+
+            // Append content from second document
+            appendDocumentContent(doc2, mergedDoc);
+
+            // Write the merged document
+            try (FileOutputStream fos = new FileOutputStream(outputFileName)) {
+                mergedDoc.write(fos);
+            }
         }
     }
-    
-    private byte[] loadResourceFile(String path) throws IOException {
-        ClassPathResource resource = new ClassPathResource(path);
-        return FileCopyUtils.copyToByteArray(resource.getInputStream());
-    }
-    
-    private void copyDocument(XWPFDocument source, XWPFDocument target) {
-        // Copy paragraphs
+
+    private void appendDocumentContent(XWPFDocument source, XWPFDocument target) {
         for (XWPFParagraph paragraph : source.getParagraphs()) {
             XWPFParagraph newParagraph = target.createParagraph();
-            newParagraph.setAlignment(paragraph.getAlignment());
-            newParagraph.setSpacingAfter(paragraph.getSpacingAfter());
-            newParagraph.setSpacingBefore(paragraph.getSpacingBefore());
-            newParagraph.setSpacingBetween(paragraph.getSpacingBetween());
-            
-            // Copy runs (text and its formatting)
-            for (XWPFRun run : paragraph.getRuns()) {
-                XWPFRun newRun = newParagraph.createRun();
-                newRun.setText(run.getText(0));
-                newRun.setBold(run.isBold());
-                newRun.setItalic(run.isItalic());
-                newRun.setUnderline(run.getUnderline());
-                newRun.setFontSize(run.getFontSize());
-                newRun.setFontFamily(run.getFontFamily());
-                
-                // Copy pictures if present
-                for (XWPFPicture pic : run.getEmbeddedPictures()) {
-                    try {
-                        newRun.addPicture(
-                            pic.getPictureData().getData(),
-                            pic.getPictureData().getPictureType(),
-                            pic.getDescription(),
-                            Units.toEMU(pic.getWidth()),
-                            Units.toEMU(pic.getHeight())
-                        );
-                    } catch (Exception e) {
-                        // Log error but continue processing
-                        e.printStackTrace();
-                    }
-                }
-            }
+            newParagraph.getCTP().set(paragraph.getCTP().copy());
         }
-        
-        // Copy tables
+
         for (XWPFTable table : source.getTables()) {
             XWPFTable newTable = target.createTable();
-            
-            // Copy table properties
-            newTable.setCellMargins(
-                table.getCellMarginLeft(),
-                table.getCellMarginTop(),
-                table.getCellMarginRight(),
-                table.getCellMarginBottom()
-            );
-            
-            // Copy rows and cells
-            for (XWPFTableRow row : table.getRows()) {
-                XWPFTableRow newRow = newTable.createRow();
-                for (XWPFTableCell cell : row.getTableCells()) {
-                    XWPFTableCell newCell = newRow.addNewTableCell();
-                    newCell.setText(cell.getText());
-                    newCell.setVerticalAlignment(cell.getVerticalAlignment());
-                    newCell.setWidth(cell.getWidth());
-                }
-            }
+            newTable.getCTTbl().set(table.getCTTbl().copy());
         }
     }
 }
