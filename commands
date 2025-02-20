@@ -1,67 +1,94 @@
-import com.itextpdf.kernel.pdf.*;
-import com.itextpdf.layout.Document;
-import com.itextpdf.layout.element.*;
 import org.apache.poi.xwpf.usermodel.*;
-import org.springframework.stereotype.Service;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.util.List;
-import java.util.Base64;
 
-@Service
-public class DocxToPdfService {
-
-    public byte[] convertMultipleDocxToSinglePdf(List<DocumentContent> docxList) throws IOException {
-        ByteArrayOutputStream finalPdfOutputStream = new ByteArrayOutputStream();
-        PdfWriter writer = new PdfWriter(finalPdfOutputStream);
-        PdfDocument mergedPdf = new PdfDocument(writer);
-
-        for (DocumentContent docx : docxList) {
-            byte[] decodedDocx = Base64.getDecoder().decode(docx.getContent());
-            byte[] pdfBytes = convertDocxToPdf(decodedDocx);
-            appendPdfToMergedPdf(pdfBytes, mergedPdf);
-        }
-
-        mergedPdf.close();
-        return finalPdfOutputStream.toByteArray();
-    }
-
-    private byte[] convertDocxToPdf(byte[] docxContent) throws IOException {
-        ByteArrayInputStream docxInputStream = new ByteArrayInputStream(docxContent);
-        XWPFDocument document = new XWPFDocument(docxInputStream);
-        ByteArrayOutputStream pdfOutputStream = new ByteArrayOutputStream();
-        PdfWriter writer = new PdfWriter(pdfOutputStream);
-        PdfDocument pdf = new PdfDocument(writer);
-        Document pdfDocument = new Document(pdf);
-
-        for (IBodyElement element : document.getBodyElements()) {
-            if (element instanceof XWPFParagraph) {
-                pdfDocument.add(new Paragraph(((XWPFParagraph) element).getText()));
-            } else if (element instanceof XWPFTable) {
-                pdfDocument.add(convertTable((XWPFTable) element));
+public class DocxMerger {
+    public byte[] mergeDocuments(List<Document> documents) throws Exception {
+        // Create a new output document
+        XWPFDocument mergedDoc = new XWPFDocument();
+        
+        for (int i = 0; i < documents.size(); i++) {
+            // Create document from byte array
+            ByteArrayInputStream bis = new ByteArrayInputStream(documents.get(i).getData());
+            XWPFDocument currentDoc = new XWPFDocument(bis);
+            
+            // Copy all elements from current document to merged document
+            for (IBodyElement element : currentDoc.getBodyElements()) {
+                if (element instanceof XWPFParagraph) {
+                    XWPFParagraph paragraph = (XWPFParagraph) element;
+                    XWPFParagraph newParagraph = mergedDoc.createParagraph();
+                    
+                    // Copy paragraph style
+                    newParagraph.setAlignment(paragraph.getAlignment());
+                    newParagraph.setSpacingAfter(paragraph.getSpacingAfter());
+                    newParagraph.setSpacingBefore(paragraph.getSpacingBefore());
+                    newParagraph.setSpacingBetween(paragraph.getSpacingBetween());
+                    
+                    // Copy runs (text and formatting)
+                    for (XWPFRun run : paragraph.getRuns()) {
+                        XWPFRun newRun = newParagraph.createRun();
+                        newRun.setText(run.getText(0));
+                        newRun.setBold(run.isBold());
+                        newRun.setItalic(run.isItalic());
+                        newRun.setUnderline(run.getUnderline());
+                        newRun.setFontSize(run.getFontSize());
+                        newRun.setFontFamily(run.getFontFamily());
+                        
+                        // Copy pictures if present
+                        for (XWPFPicture pic : run.getEmbeddedPictures()) {
+                            newRun.addPicture(
+                                pic.getPictureData().getData(),
+                                pic.getPictureData().getPictureType(),
+                                pic.getDescription(),
+                                Units.toEMU(pic.getWidth()),
+                                Units.toEMU(pic.getHeight())
+                            );
+                        }
+                    }
+                } else if (element instanceof XWPFTable) {
+                    XWPFTable table = (XWPFTable) element;
+                    XWPFTable newTable = mergedDoc.createTable();
+                    
+                    // Copy table properties
+                    newTable.setCellMargins(
+                        table.getCellMarginLeft(),
+                        table.getCellMarginTop(),
+                        table.getCellMarginRight(),
+                        table.getCellMarginBottom()
+                    );
+                    
+                    // Copy rows and cells
+                    for (XWPFTableRow row : table.getRows()) {
+                        XWPFTableRow newRow = newTable.createRow();
+                        for (XWPFTableCell cell : row.getTableCells()) {
+                            XWPFTableCell newCell = newRow.addNewTableCell();
+                            newCell.setText(cell.getText());
+                            // Copy cell formatting
+                            newCell.setVerticalAlignment(cell.getVerticalAlignment());
+                            newCell.setWidth(cell.getWidth());
+                        }
+                    }
+                }
             }
-        }
-
-        pdfDocument.close();
-        document.close();
-        return pdfOutputStream.toByteArray();
-    }
-
-    private Table convertTable(XWPFTable table) {
-        List<XWPFTableRow> rows = table.getRows();
-        int numCols = rows.get(0).getTableCells().size();
-        Table pdfTable = new Table(numCols);
-        for (XWPFTableRow row : rows) {
-            for (XWPFTableCell cell : row.getTableCells()) {
-                pdfTable.addCell(new Cell().add(new Paragraph(cell.getText())));
+            
+            // Add page break between documents (except for the last document)
+            if (i < documents.size() - 1) {
+                mergedDoc.createParagraph().setPageBreak(true);
             }
+            
+            bis.close();
         }
-        return pdfTable;
-    }
-
-    private void appendPdfToMergedPdf(byte[] pdfBytes, PdfDocument mergedPdf) throws IOException {
-        PdfReader reader = new PdfReader(new ByteArrayInputStream(pdfBytes));
-        PdfDocument tempPdf = new PdfDocument(reader);
-        tempPdf.copyPagesTo(1, tempPdf.getNumberOfPages(), mergedPdf);
-        tempPdf.close();
+        
+        // Convert merged document to byte array
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        mergedDoc.write(bos);
+        byte[] mergedDocBytes = bos.toByteArray();
+        
+        // Clean up
+        bos.close();
+        mergedDoc.close();
+        
+        return mergedDocBytes;
     }
 }
