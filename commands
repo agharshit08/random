@@ -1,94 +1,102 @@
 import org.apache.poi.xwpf.usermodel.*;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.util.List;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.util.FileCopyUtils;
 
-public class DocxMerger {
-    public byte[] mergeDocuments(List<Document> documents) throws Exception {
-        // Create a new output document
-        XWPFDocument mergedDoc = new XWPFDocument();
+import java.io.*;
+
+public class ResourceDocxMerger {
+    public byte[] mergeTwoDocuments(String firstDocPath, String secondDocPath) throws IOException {
+        // Load documents from resources
+        byte[] firstDocBytes = loadResourceFile(firstDocPath);
+        byte[] secondDocBytes = loadResourceFile(secondDocPath);
         
-        for (int i = 0; i < documents.size(); i++) {
-            // Create document from byte array
-            ByteArrayInputStream bis = new ByteArrayInputStream(documents.get(i).getData());
-            XWPFDocument currentDoc = new XWPFDocument(bis);
+        // Create merged document
+        try (XWPFDocument mergedDoc = new XWPFDocument();
+             ByteArrayInputStream firstDocStream = new ByteArrayInputStream(firstDocBytes);
+             ByteArrayInputStream secondDocStream = new ByteArrayInputStream(secondDocBytes);
+             XWPFDocument firstDoc = new XWPFDocument(firstDocStream);
+             XWPFDocument secondDoc = new XWPFDocument(secondDocStream);
+             ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+
+            // Copy content from first document
+            copyDocument(firstDoc, mergedDoc);
             
-            // Copy all elements from current document to merged document
-            for (IBodyElement element : currentDoc.getBodyElements()) {
-                if (element instanceof XWPFParagraph) {
-                    XWPFParagraph paragraph = (XWPFParagraph) element;
-                    XWPFParagraph newParagraph = mergedDoc.createParagraph();
-                    
-                    // Copy paragraph style
-                    newParagraph.setAlignment(paragraph.getAlignment());
-                    newParagraph.setSpacingAfter(paragraph.getSpacingAfter());
-                    newParagraph.setSpacingBefore(paragraph.getSpacingBefore());
-                    newParagraph.setSpacingBetween(paragraph.getSpacingBetween());
-                    
-                    // Copy runs (text and formatting)
-                    for (XWPFRun run : paragraph.getRuns()) {
-                        XWPFRun newRun = newParagraph.createRun();
-                        newRun.setText(run.getText(0));
-                        newRun.setBold(run.isBold());
-                        newRun.setItalic(run.isItalic());
-                        newRun.setUnderline(run.getUnderline());
-                        newRun.setFontSize(run.getFontSize());
-                        newRun.setFontFamily(run.getFontFamily());
-                        
-                        // Copy pictures if present
-                        for (XWPFPicture pic : run.getEmbeddedPictures()) {
-                            newRun.addPicture(
-                                pic.getPictureData().getData(),
-                                pic.getPictureData().getPictureType(),
-                                pic.getDescription(),
-                                Units.toEMU(pic.getWidth()),
-                                Units.toEMU(pic.getHeight())
-                            );
-                        }
-                    }
-                } else if (element instanceof XWPFTable) {
-                    XWPFTable table = (XWPFTable) element;
-                    XWPFTable newTable = mergedDoc.createTable();
-                    
-                    // Copy table properties
-                    newTable.setCellMargins(
-                        table.getCellMarginLeft(),
-                        table.getCellMarginTop(),
-                        table.getCellMarginRight(),
-                        table.getCellMarginBottom()
-                    );
-                    
-                    // Copy rows and cells
-                    for (XWPFTableRow row : table.getRows()) {
-                        XWPFTableRow newRow = newTable.createRow();
-                        for (XWPFTableCell cell : row.getTableCells()) {
-                            XWPFTableCell newCell = newRow.addNewTableCell();
-                            newCell.setText(cell.getText());
-                            // Copy cell formatting
-                            newCell.setVerticalAlignment(cell.getVerticalAlignment());
-                            newCell.setWidth(cell.getWidth());
-                        }
+            // Add page break between documents
+            mergedDoc.createParagraph().setPageBreak(true);
+            
+            // Copy content from second document
+            copyDocument(secondDoc, mergedDoc);
+            
+            // Write the merged document to byte array
+            mergedDoc.write(outputStream);
+            return outputStream.toByteArray();
+        }
+    }
+    
+    private byte[] loadResourceFile(String path) throws IOException {
+        ClassPathResource resource = new ClassPathResource(path);
+        return FileCopyUtils.copyToByteArray(resource.getInputStream());
+    }
+    
+    private void copyDocument(XWPFDocument source, XWPFDocument target) {
+        // Copy paragraphs
+        for (XWPFParagraph paragraph : source.getParagraphs()) {
+            XWPFParagraph newParagraph = target.createParagraph();
+            newParagraph.setAlignment(paragraph.getAlignment());
+            newParagraph.setSpacingAfter(paragraph.getSpacingAfter());
+            newParagraph.setSpacingBefore(paragraph.getSpacingBefore());
+            newParagraph.setSpacingBetween(paragraph.getSpacingBetween());
+            
+            // Copy runs (text and its formatting)
+            for (XWPFRun run : paragraph.getRuns()) {
+                XWPFRun newRun = newParagraph.createRun();
+                newRun.setText(run.getText(0));
+                newRun.setBold(run.isBold());
+                newRun.setItalic(run.isItalic());
+                newRun.setUnderline(run.getUnderline());
+                newRun.setFontSize(run.getFontSize());
+                newRun.setFontFamily(run.getFontFamily());
+                
+                // Copy pictures if present
+                for (XWPFPicture pic : run.getEmbeddedPictures()) {
+                    try {
+                        newRun.addPicture(
+                            pic.getPictureData().getData(),
+                            pic.getPictureData().getPictureType(),
+                            pic.getDescription(),
+                            Units.toEMU(pic.getWidth()),
+                            Units.toEMU(pic.getHeight())
+                        );
+                    } catch (Exception e) {
+                        // Log error but continue processing
+                        e.printStackTrace();
                     }
                 }
             }
-            
-            // Add page break between documents (except for the last document)
-            if (i < documents.size() - 1) {
-                mergedDoc.createParagraph().setPageBreak(true);
-            }
-            
-            bis.close();
         }
         
-        // Convert merged document to byte array
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        mergedDoc.write(bos);
-        byte[] mergedDocBytes = bos.toByteArray();
-        
-        // Clean up
-        bos.close();
-        mergedDoc.close();
-        
-        return mergedDocBytes;
+        // Copy tables
+        for (XWPFTable table : source.getTables()) {
+            XWPFTable newTable = target.createTable();
+            
+            // Copy table properties
+            newTable.setCellMargins(
+                table.getCellMarginLeft(),
+                table.getCellMarginTop(),
+                table.getCellMarginRight(),
+                table.getCellMarginBottom()
+            );
+            
+            // Copy rows and cells
+            for (XWPFTableRow row : table.getRows()) {
+                XWPFTableRow newRow = newTable.createRow();
+                for (XWPFTableCell cell : row.getTableCells()) {
+                    XWPFTableCell newCell = newRow.addNewTableCell();
+                    newCell.setText(cell.getText());
+                    newCell.setVerticalAlignment(cell.getVerticalAlignment());
+                    newCell.setWidth(cell.getWidth());
+                }
+            }
+        }
     }
 }
